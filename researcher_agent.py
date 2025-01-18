@@ -14,8 +14,7 @@ from chains.query_rewriter import query_rewriter
 from dotenv import load_dotenv
 load_dotenv()
 
-# Constants
-MAX_LOOP_COUNT = 5
+from config import MAX_LOOP_COUNT
 
 # Graph definition
 researcher_agent = StateGraph(ResearcherInternalState, input=BrandState, output=BrandDocState)

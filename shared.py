@@ -7,21 +7,22 @@ from typing import Annotated
 from operator import add
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
+from config import base_llm_model, reasoning_llm_model, embedding_model, vector_store_collection_name, vector_store_directory
 
 # import API keys from environment variables
 load_dotenv()
 
 # define LLM models
-llm = ChatOpenAI(model="gpt-4o")
-reasoning_llm = ChatOpenAI(model="o1-mini")
+llm = ChatOpenAI(model=base_llm_model)
+reasoning_llm = ChatOpenAI(model=reasoning_llm_model)
 
 # define vector database
-embeddings = OpenAIEmbeddings(model="text-embedding-3-large")
+embeddings = OpenAIEmbeddings(model=embedding_model)
 
 vector_store = Chroma(
-    collection_name="brand_analysis",
+    collection_name=vector_store_collection_name,
     embedding_function=embeddings,
-    persist_directory="./chroma_langchain_db",  # Where to save data locally, remove if not necessary
+    persist_directory=vector_store_directory,  # Where to save data locally, remove if not necessary
 )
 
 # Define states

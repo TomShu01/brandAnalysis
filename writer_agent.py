@@ -3,15 +3,7 @@ from langchain_core.prompts import PromptTemplate
 from langgraph.graph import END, StateGraph, START
 from shared import vector_store, BrandState, ReportState, WriterInternalState, llm
 from prompts import report_template, generate_report_prompt
-
-# List of sections in the report
-sections = [{"title": "Trends", "section": "Emerging and Ongoing Social Trends Related to the Brand"},
-            {"title": "Sentiment Ratio", "section": "brand's sentiment ratio within the target audience"},
-            {"title": "Hot Topics", "section": "most discussed topics about the brand"},
-            {"title": "Audience Preferences", "section": "target audience preferences"},
-            {"title": "Brand Competitors", "section": "Which brands are the audience comparing the brand with"},
-            {"title": "Opportunities", "section": "Strategic Opportunities for the brand"},
-            {"title": "Actionables", "section": "actionables for the brand"}]
+from config import sections
 
 # Graph definition
 writer_agent = StateGraph(WriterInternalState, input=BrandState, output=ReportState)
