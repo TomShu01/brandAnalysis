@@ -1,0 +1,68 @@
+#!/usr/bin/python3.10
+from langchain_core.prompts import PromptTemplate
+from langgraph.graph import END, StateGraph, START
+from shared import vector_store, WriterState, llm
+from prompts import report_template, generate_report_prompt
+
+# List of sections in the report
+sections = [{"title": "Trends", "section": "Emerging and Ongoing Social Trends Related to the Brand"},
+            {"title": "Sentiment Ratio", "section": "brand's sentiment ratio within the target audience"},
+            {"title": "Hot Topics", "section": "most discussed topics about the brand"},
+            {"title": "Audience Preferences", "section": "target audience preferences"},
+            {"title": "Brand Competitors", "section": "Which brands are the audience comparing the brand with"},
+            {"title": "Opportunities", "section": "Strategic Opportunities for the brand"},
+            {"title": "Actionables", "section": "actionables for the brand"}]
+
+# Graph definition
+writer_agent = StateGraph(WriterState)
+
+# define nodes in the graph
+def gather_info_node(state: WriterState):
+    """
+    retrieves documents from the vector database and organizes the notes on the brand
+
+    Args:
+        state (dict): The current graph state
+
+    Returns:
+        state (dict): Updates notes key with an organized collection of info about the brand
+    """
+
+    notes = ""
+    
+    for section in sections:
+        query = section["title"] + ": " + section["section"]
+        docs = vector_store.similarity_search(query)
+        notes+= section["title"] + ": \n" + str(docs) + "\n"
+    
+    summarized_notes = llm.invoke("summarize the following such that its size is reduced by half" + notes)
+    
+    return({"notes": summarized_notes})
+
+def generate_report_node(state: WriterState):
+    """
+    Generates a report on the brand based on collected info on the brand from notes
+    and a template for the report
+
+    Args:
+        state (dict): The current graph state
+
+    Returns:
+        state (dict): Updates report key with the generated report
+    """
+
+    report_generation_template = PromptTemplate.from_template(generate_report_prompt)
+    report_generate = report_generation_template | llm
+    return({"report": report_generate.invoke({"brand": state["brand"], "notes": state["notes"], "template": report_template})})
+
+# add nodes to graph
+writer_agent.add_node("gather_info_node", gather_info_node)
+writer_agent.add_node("generate_report_node", generate_report_node)
+
+# add edges to graph
+writer_agent.add_edge(START, "gather_info_node")
+writer_agent.add_edge("gather_info_node", "generate_report_node")
+writer_agent.add_edge("generate_report_node", END)
+
+# Compile our agent
+writer_agent = writer_agent.compile()

@@ -53,4 +53,4 @@ hard part: the sheer volume of data makes prompt engineering inefficient. This i
 - build a chain of thought, reflection agent to generate recommendations
 - store state into PGVector
 - build a frontend
-- bonus: integrate reddit API, and other search engines. build in more visualization in final report
+- bonus: integrate reddit API, and other search engines. build in more visualization in final report. Q & A after generating the report
