@@ -5,7 +5,6 @@ from shared import GraphState
 from researcher_agent import researcher_agent
 from analysis_agent import analysis_agent
 from writer_agent import writer_agent
-import pprint
 
 # Define main graph
 graph = StateGraph(GraphState)
@@ -35,7 +34,7 @@ if __name__ == "__main__":
                 break
 
             result = graph.invoke({'brand': user_input})
-            pprint.pp(result["report"])
+            result["report"].pretty_print() 
         except Exception as e:
             print("error occurred during inference:")
             print(e)

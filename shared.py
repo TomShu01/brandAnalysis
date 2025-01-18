@@ -34,6 +34,7 @@ class State(TypedDict):
 class GraphState(State):
     report: str
 
+
 # State for the reseacher agent
 class InputState(TypedDict):
     brand: str
@@ -44,6 +45,7 @@ class OutputState(TypedDict):
 
 class OverallState(InputState, OutputState):
     query: str
+    loop_count: int
 
 # State for the analysis agent
 class AnalysisState(State):

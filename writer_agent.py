@@ -28,16 +28,18 @@ def gather_info_node(state: WriterState):
         state (dict): Updates notes key with an organized collection of info about the brand
     """
 
+    print("---ORGANIZE RESEARCH ON BRAND---")
     notes = ""
     
     for section in sections:
         query = section["title"] + ": " + section["section"]
         docs = vector_store.similarity_search(query)
+        docs = ["Content:\n" + doc.page_content + "\nmetadata:\n" + str(doc.metadata) for doc in docs]
         notes+= section["title"] + ": \n" + str(docs) + "\n"
     
-    summarized_notes = llm.invoke("summarize the following such that its size is reduced by half" + notes)
+    # summarized_notes = llm.invoke("summarize the following such that its size is reduced by half" + notes)
     
-    return({"notes": summarized_notes})
+    return({"notes": notes})
 
 def generate_report_node(state: WriterState):
     """
@@ -51,6 +53,7 @@ def generate_report_node(state: WriterState):
         state (dict): Updates report key with the generated report
     """
 
+    print("---GENERATE FINAL REPORT ON BRAND---")
     report_generation_template = PromptTemplate.from_template(generate_report_prompt)
     report_generate = report_generation_template | llm
     return({"report": report_generate.invoke({"brand": state["brand"], "notes": state["notes"], "template": report_template})})

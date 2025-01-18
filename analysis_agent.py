@@ -20,6 +20,7 @@ def analysis(state: AnalysisState, query):
         state (dict): Updates derived_documents key with a re-phrased question
     """
 
+    print("---CONDUCTING ANALYSIS ON SPECIFIC TOPIC---")
     prompt_template = PromptTemplate.from_template(query)
     analysis_llm = prompt_template | llm
     doc = analysis_llm.invoke({"brand": state["brand"], "documents": str(state["documents"])})
@@ -91,6 +92,7 @@ def generate_recommendations(state: AnalysisState):
         state (dict): Updates derived_documents to add the recommendations
     """
 
+    print("---GENERATE RECOMMENDATIONS FOR THE BRAND---")
     prompt = ChatPromptTemplate.from_messages(
         [("user",
           """

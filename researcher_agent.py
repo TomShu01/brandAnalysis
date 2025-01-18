@@ -14,6 +14,9 @@ from chains.query_rewriter import query_rewriter
 from dotenv import load_dotenv
 load_dotenv()
 
+# Constants
+MAX_LOOP_COUNT = 5
+
 # Graph definition
 researcher_agent = StateGraph(OverallState, input=InputState, output=OutputState)
 
@@ -28,8 +31,9 @@ def initialize_query_node(state: InputState):
     Returns:
         state (dict): Updates the query key in graph state
     """
-    
-    return {"query" : initial_query}
+
+    print("---INITIALIZE WEB SEARCH QUERY---")
+    return {"query" : initial_query, "loop_count": 0}
 
 def web_search_node(state: OverallState):
     """
@@ -42,12 +46,13 @@ def web_search_node(state: OverallState):
         state (dict): Updates the documents key in graph state
     """
 
+    print("---PERFORM WEB SEARCH---")
     prompt_template = PromptTemplate.from_template(state["query"])
     formatted_query = prompt_template.format(brand=state["brand"])
     web_search_tool = TavilySearchResults(max_results=2)
     docs = web_search_tool.invoke({"query": formatted_query})
 
-    return {"documents": docs}
+    return {"documents": docs, "loop_count": state["loop_count"] + 1}
 
 def eval_edge(state: OverallState):
     """
@@ -63,6 +68,9 @@ def eval_edge(state: OverallState):
     print("---CHECK DOCUMENT RELEVANCE TO QUESTION---")
     brand = state["brand"]
     documents = state["documents"]
+
+    if (state["loop_count"] > MAX_LOOP_COUNT):
+        return("yes")
 
     score = doc_grader(llm).invoke(
         {"question": brand, "document": str([doc["content"] for doc in documents])}
@@ -99,6 +107,7 @@ def insert_db_node(state: OverallState):
         Empty object
     """
 
+    print("---INSERT RETRIEVED DOCUMENTS TO DATABASE---")
     documents = [
         Document(page_content=doc["content"], metadata={"url": doc["url"], "type": "fact"})
         for doc in state["documents"]
