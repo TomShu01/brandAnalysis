@@ -25,33 +25,27 @@ vector_store = Chroma(
 )
 
 # Define states
-# Base class for state
-class State(TypedDict):
+# Base classes for state
+class BrandState(TypedDict):
     brand: str
-    documents: Annotated[list, add]
 
-# State for the parent agent
-class GraphState(State):
+class ReportState(TypedDict):
     report: str
 
-
-# State for the reseacher agent
-class InputState(TypedDict):
-    brand: str
-
-class OutputState(TypedDict):
-    brand: str
+class BrandDocState(BrandState):
     documents: Annotated[list, add]
 
-class OverallState(InputState, OutputState):
+# internal state for agents:
+class ResearcherInternalState(BrandDocState):
     query: str
     loop_count: int
 
-# State for the analysis agent
-class AnalysisState(State):
+class AnalysisInternalState(BrandDocState):
     derived_documents: Annotated[list, add]
 
-# State for the writer agent
-class WriterState(State):
+class WriterInternalState(BrandState, ReportState):
     notes: str
-    report: str
+
+# State for the parent agent
+class GraphState(BrandDocState, ReportState):
+    pass

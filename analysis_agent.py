@@ -2,13 +2,13 @@
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langgraph.graph import END, StateGraph, START
 from langchain.schema import Document
-from shared import vector_store, AnalysisState, llm, reasoning_llm
+from shared import vector_store, BrandState, BrandDocState, AnalysisInternalState, llm, reasoning_llm
 from prompts import trend_query, social_signal_query, topics_query, sentiment_query
 
 # Graph definition
-analysis_agent = StateGraph(AnalysisState)
+analysis_agent = StateGraph(AnalysisInternalState, input=BrandDocState, output=BrandState)
 
-def analysis(state: AnalysisState, query):
+def analysis(state: AnalysisInternalState, query):
     """
     Instructs the LLM model to perform analysis on the state according to query
 
@@ -29,7 +29,7 @@ def analysis(state: AnalysisState, query):
     return {"derived_documents": [doc]}
 
 # define nodes in the graph
-def trend_analysis(state: AnalysisState):
+def trend_analysis(state: BrandDocState):
     """
     Calls the analysis function to perform analysis on the trend_query prompt
 
@@ -42,7 +42,7 @@ def trend_analysis(state: AnalysisState):
 
     return(analysis(state, trend_query))
 
-def social_signal_analysis(state: AnalysisState):
+def social_signal_analysis(state: BrandDocState):
     """
     Calls the analysis function to perform analysis on the social_signal_query prompt
 
@@ -55,7 +55,7 @@ def social_signal_analysis(state: AnalysisState):
     
     return(analysis(state, social_signal_query))
 
-def topics_analysis(state: AnalysisState):
+def topics_analysis(state: BrandDocState):
     """
     Calls the analysis function to perform analysis on the topics_query prompt
 
@@ -68,7 +68,7 @@ def topics_analysis(state: AnalysisState):
     
     return(analysis(state, topics_query))
 
-def sentiment_analysis(state: AnalysisState):
+def sentiment_analysis(state: BrandDocState):
     """
     Calls the analysis function to perform analysis on the sentiment_query prompt
 
@@ -81,7 +81,7 @@ def sentiment_analysis(state: AnalysisState):
 
     return(analysis(state, sentiment_query))
 
-def generate_recommendations(state: AnalysisState):
+def generate_recommendations(state: AnalysisInternalState):
     """
     Generates recommendations for the brand based on derived_documents from previous analysis nodes
 

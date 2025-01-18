@@ -1,7 +1,7 @@
 #!/usr/bin/python3.10
 from langchain_core.prompts import PromptTemplate
 from langgraph.graph import END, StateGraph, START
-from shared import vector_store, WriterState, llm
+from shared import vector_store, BrandState, ReportState, WriterInternalState, llm
 from prompts import report_template, generate_report_prompt
 
 # List of sections in the report
@@ -14,10 +14,10 @@ sections = [{"title": "Trends", "section": "Emerging and Ongoing Social Trends R
             {"title": "Actionables", "section": "actionables for the brand"}]
 
 # Graph definition
-writer_agent = StateGraph(WriterState)
+writer_agent = StateGraph(WriterInternalState, input=BrandState, output=ReportState)
 
 # define nodes in the graph
-def gather_info_node(state: WriterState):
+def gather_info_node(state: BrandState):
     """
     retrieves documents from the vector database and organizes the notes on the brand
 
@@ -32,7 +32,7 @@ def gather_info_node(state: WriterState):
     notes = ""
     
     for section in sections:
-        query = section["title"] + ": " + section["section"]
+        query = section["title"] + "about " + state["brand"] + ": " + section["section"]
         docs = vector_store.similarity_search(query)
         docs = ["Content:\n" + doc.page_content + "\nmetadata:\n" + str(doc.metadata) for doc in docs]
         notes+= section["title"] + ": \n" + str(docs) + "\n"
@@ -41,7 +41,7 @@ def gather_info_node(state: WriterState):
     
     return({"notes": notes})
 
-def generate_report_node(state: WriterState):
+def generate_report_node(state: WriterInternalState):
     """
     Generates a report on the brand based on collected info on the brand from notes
     and a template for the report

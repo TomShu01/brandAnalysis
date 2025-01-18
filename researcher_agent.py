@@ -3,7 +3,7 @@ from langchain_core.prompts import PromptTemplate
 from langgraph.graph import END, StateGraph, START
 from langchain.schema import Document
 from langchain_community.tools.tavily_search import TavilySearchResults
-from shared import vector_store, InputState, OutputState, OverallState, llm
+from shared import vector_store, BrandState, BrandDocState, ResearcherInternalState, llm
 from prompts import initial_query
 
 # import useful chains
@@ -18,10 +18,10 @@ load_dotenv()
 MAX_LOOP_COUNT = 5
 
 # Graph definition
-researcher_agent = StateGraph(OverallState, input=InputState, output=OutputState)
+researcher_agent = StateGraph(ResearcherInternalState, input=BrandState, output=BrandDocState)
 
 # define nodes in the graph
-def initialize_query_node(state: InputState):
+def initialize_query_node(state: BrandState):
     """
     Initializes the search query passed into Tavily to perform the initial web search
 
@@ -35,7 +35,7 @@ def initialize_query_node(state: InputState):
     print("---INITIALIZE WEB SEARCH QUERY---")
     return {"query" : initial_query, "loop_count": 0}
 
-def web_search_node(state: OverallState):
+def web_search_node(state: ResearcherInternalState):
     """
     Performs Tavily web search on the brand using query from state
 
@@ -54,7 +54,7 @@ def web_search_node(state: OverallState):
 
     return {"documents": docs, "loop_count": state["loop_count"] + 1}
 
-def eval_edge(state: OverallState):
+def eval_edge(state: ResearcherInternalState):
     """
     Determines whether the retrieved documents are relevant to the question.
 
@@ -78,7 +78,7 @@ def eval_edge(state: OverallState):
     grade = score.binary_score
     return grade
 
-def transform_query_node(state: OverallState):
+def transform_query_node(state: ResearcherInternalState):
     """
     Transform the query to produce a better question.
 
@@ -96,7 +96,7 @@ def transform_query_node(state: OverallState):
     better_query= query_rewriter(llm).invoke({"query": query})
     return {"query": better_query}
 
-def insert_db_node(state: OverallState):
+def insert_db_node(state: ResearcherInternalState):
     """
     Inserts documents to the vector database
 
