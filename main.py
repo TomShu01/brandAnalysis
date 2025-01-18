@@ -1,4 +1,3 @@
-#!/usr/bin/python3.10
 from langgraph.graph import END, StateGraph, START
 from shared import GraphState
 # import agents:

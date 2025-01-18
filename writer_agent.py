@@ -1,4 +1,3 @@
-#!/usr/bin/python3.10
 from langchain_core.prompts import PromptTemplate
 from langgraph.graph import END, StateGraph, START
 from shared import vector_store, BrandState, ReportState, WriterInternalState, llm

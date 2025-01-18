@@ -1,4 +1,3 @@
-# 
 from IPython.display import Image
 
 def generate_architecture_pic(agent, picture_name):

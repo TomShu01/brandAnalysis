@@ -1,4 +1,3 @@
-#!/usr/bin/python3.10
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langgraph.graph import END, StateGraph, START
 from langchain.schema import Document

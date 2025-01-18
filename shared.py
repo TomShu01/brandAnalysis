@@ -1,4 +1,3 @@
-#!/usr/bin/python3.10
 # Contains vector database definition and state definitions
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
