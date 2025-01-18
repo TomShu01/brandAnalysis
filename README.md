@@ -99,6 +99,7 @@ Final Report format:
 - `shared.py`: Shared objects such as LLM models, vector database and state are stored here
 - `config.py`: Customization of agents
 - `utils.py`: Useful tools you may use within the code, such as printing images for agent architecture
+- chains directory: contains LLM chains that perform custom functions for the agents
 
 # Developer notes
 - The workflow is probably the same for every brand. So, decision making mainly comes from the RAG data procured
