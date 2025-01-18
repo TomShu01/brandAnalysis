@@ -174,4 +174,4 @@ cython_debug/
 Take-Home\ Test-\ Langraph\ Agent\ for\ Brand\ Analysis\ and\ Social\ Insights.docx
 
 # database storage
-./chroma_langchain_db
+chroma_langchain_db/
